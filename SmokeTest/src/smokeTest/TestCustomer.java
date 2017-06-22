@@ -43,6 +43,9 @@ public class TestCustomer {
 		String title = driver.getTitle();
 		
 		Assert.assertTrue(title.contains("ViaSat"));
+		
+		System.out.println("your test is done");
+		
 //		driver.get(baseUrl);
 //		
 //		WebElement userNameField = driver.findElement(By.xpath("//*[@id=\"document:body\"]/table/tbody/tr[2]/td/form/table/tbody/tr[3]/td[2]/input"));
@@ -241,6 +244,13 @@ public class TestCustomer {
 		
 		driver.manage().deleteAllCookies();
 		
+	}
+	
+	@Test(priority=1, enabled=true)
+	public void comment(){
+		//This is just for testing
+		System.out.println("This fails intentionally");
+		Assert.assertTrue(false);
 	}
     
 //	@BeforeMethod
