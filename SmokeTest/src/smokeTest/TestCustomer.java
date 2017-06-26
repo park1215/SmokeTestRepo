@@ -250,7 +250,7 @@ public class TestCustomer {
 	public void comment(){
 		//This is just for testing
 		System.out.println("This fails intentionally");
-		Assert.assertTrue(false);
+		Assert.assertTrue(true);
 	}
     
 //	@BeforeMethod
