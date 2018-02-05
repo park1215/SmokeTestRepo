@@ -1,0 +1,19 @@
+__autho__='SeanPark_ViaSat'
+
+from selenium import webdriver
+
+driver=webdriver.Chrome("C:\Selenium\chromedriver.exe")
+
+driver.set_page_load_timeout(30)
+
+driver.get("http://www.google.com")
+
+driver.maximize_window()
+
+driver.implicitly_wait(20)
+
+//save to the project home directory
+driver.get_screenshot_as_file("google.png");
+
+driver.quit()
+
