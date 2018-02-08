@@ -14,11 +14,21 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import selenium.webdriver.support.ui as ui
+from selenium.webdriver.support.ui import Select
 
 wb = openpyxl.load_workbook('NewConnectOrders.xlsx')
 
+wbAddress = openpyxl.load_workbook(('./Data/Addresses.xlsx'))
+sheetAddress = wbAddress['Sheet1']
+username = sheetAddress.cell(row=4, column=2).value
+password = sheetAddress.cell(row=4, column=3).value
+salesChannel = sheetAddress.cell(row=4, column=4).value
+customerType = sheetAddress.cell(row=4, column=5).value
+
 driver=webdriver.Chrome("C:\\Selenium\\chromedriver.exe")
 # driver = webdriver.Ie("C:\Selenium\IEDriverServer.exe");
+
+driver.implicitly_wait(50)
 
 driver.set_page_load_timeout(30)
 
@@ -28,9 +38,9 @@ driver.maximize_window()
 
 driver.implicitly_wait(20)
 
-driver.find_element_by_xpath("//*[@id=\"document:body\"]/table/tbody/tr[2]/td/form/table/tbody/tr[3]/td[2]/input").send_keys("spark")
+driver.find_element_by_xpath("//*[@id=\"document:body\"]/table/tbody/tr[2]/td/form/table/tbody/tr[3]/td[2]/input").send_keys(username)
 
-driver.find_element_by_xpath("//*[@id=\"document:body\"]/table/tbody/tr[2]/td/form/table/tbody/tr[4]/td[2]/input").send_keys("Qkrtmd#3")
+driver.find_element_by_xpath("//*[@id=\"document:body\"]/table/tbody/tr[2]/td/form/table/tbody/tr[4]/td[2]/input").send_keys(password)
 
 driver.find_element_by_name("submit").click()
 
@@ -42,12 +52,18 @@ addCustomerTab = WebDriverWait(driver, 10).until(
 
 addCustomerTab.click()
 
-for item in range(2, 3):
+for item in range(3, 4):
 
     driver.implicitly_wait(3)
     time.sleep(1)
 
-    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:salesChannelMenu\"]/option[2]").click()
+    if salesChannel == 'WB_DIRECT':
+        driver.find_element_by_xpath("//*[@id=\"addCustomerForm:salesChannelMenu\"]/option[2]").click()
+
+    # salesChannelOption = selectSalesChannel(salesChannel)
+    # select = Select(driver.find_element_by_id('addCustomerForm:salesChannelMenu'))
+    #
+    # select.select_by_visible_text(salesChannel).click()
 
     now = datetime.datetime.now()
 
@@ -58,7 +74,7 @@ for item in range(2, 3):
     hexdigits = list(string.hexdigits)
     del hexdigits[10:16]
 
-    print(hexdigits)
+    # print(hexdigits)
 
     randomMac = "AA:BB:CC:"
 
@@ -68,7 +84,11 @@ for item in range(2, 3):
         if x % 2 != 0 and len(randomMac) < 17:
             randomMac = randomMac + ":"
 
-    print(randomMac)
+    print("Mac Address : " + randomMac)
+
+    randomMacNoColon = randomMac.replace(':', '')
+
+    print(randomMacNoColon)
 
     currentMonth = months[now.month - 1]
 
@@ -94,9 +114,16 @@ for item in range(2, 3):
     driver.implicitly_wait(2)
     driver.find_element_by_xpath("//*[@id=\"addCustomerForm:transactionReference\"]").send_keys(transactionReference)
 
-    driver.implicitly_wait(2)
-    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:namesIdName1\"]").send_keys("Spider")
-    time.sleep(1)
+    # driver.implicitly_wait(2)
+    # driver.find_element_by_xpath("//*[@id=\"addCustomerForm:namesIdName1\"]").send_keys("Spider")
+    # time.sleep(1)
+
+    firstNameField = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH,
+                                        "//*[@id=\"addCustomerForm:namesIdName1\"]"))
+    )
+
+    firstNameField.send_keys("Spider")
 
     driver.implicitly_wait(2)
     driver.find_element_by_xpath("//*[@id=\"addCustomerForm:namesIdName3\"]").send_keys("Man")
@@ -252,7 +279,8 @@ for item in range(2, 3):
 
     serviceAgreementReference = driver.find_element_by_xpath('//*[@id="addCustomerForm:serviceAgreementReference"]').text
 
-    print(serviceAgreementReference)
+    print("Sales Channel : " + salesChannel)
+    print("External Account Reference : " + serviceAgreementReference)
 
     newOrderButton = driver.find_element_by_xpath('//*[@id="addCustomerForm:newOrderButtonId"]')
 
@@ -321,3 +349,16 @@ wb.save('NewConnectOrders.xlsx')
 # driver.find_element_by_id("loginbutton").click()
 #
 # driver.quit()
+
+def selectSalesChannel(x):
+    return {
+        'WB_DIRECT': 2,
+        'ATT': 3,
+        'MEXICO_RETAIL': 4,
+        'US_COMMUNITIES': 5,
+        'US_SMALLBUSINESS':6,
+        'DISH_DIRECT_RETAIL':7,
+        'MEDIA_NETWORKS':8,
+        'B2B_PARTNERS':9,
+        'FIELD_TRIAL':10
+    }.get(x, 'WB_DIRECT')

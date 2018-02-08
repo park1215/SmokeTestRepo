@@ -75,7 +75,7 @@ print(type(wb))
 
 print(wb.sheetnames)
 
-wb.create_sheet('1')
+# wb.create_sheet('1')
 sheet = wb['1']
 
 sheet.cell(row=2, column=2).value = 'test'
@@ -92,6 +92,13 @@ print(type(sheet))
 wb.save('NewConnectOrders.xlsx')
 
 print(sheet.cell(row=2, column=2).value)
+
+wbAddress = openpyxl.load_workbook(('./Data/Addresses.xlsx'))
+sheetAddress = wbAddress['Sheet1']
+print(sheetAddress.cell(row=4, column=2).value)
+print(sheetAddress.cell(row=4, column=3).value)
+print(sheetAddress.cell(row=4, column=4).value)
+print(sheetAddress.cell(row=4, column=5).value)
 
 
 
