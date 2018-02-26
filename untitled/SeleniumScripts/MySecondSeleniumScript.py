@@ -15,6 +15,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import selenium.webdriver.support.ui as ui
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.keys import Keys
 
 wb = openpyxl.load_workbook('NewConnectOrders.xlsx')
 
@@ -52,7 +53,7 @@ addCustomerTab = WebDriverWait(driver, 10).until(
 
 addCustomerTab.click()
 
-for item in range(3, 4):
+for item in range(1, 2):
 
     driver.implicitly_wait(3)
     time.sleep(1)
@@ -96,8 +97,12 @@ for item in range(3, 4):
 
     if now.day < 10:
         currentDay = '0' + str(now.day)
+    else:
+        currentDay = str(now.day)
 
     transactionReference = "SPark_" + currentDay + currentMonth + currentYear + str(item)
+
+    print("Transaction Reference : " + transactionReference)
 
     newSheet = currentDay + "-" + currentMonth + "-" + currentYear
 
@@ -140,6 +145,8 @@ for item in range(3, 4):
     driver.implicitly_wait(2)
     driver.find_element_by_xpath("//*[@id=\"addCustomerForm:addressIdMaybeTableStateAddressState\"]/option[7]").click()
     time.sleep(1)
+
+    # elem.send_keys(Keys.RETURN)
 
     driver.implicitly_wait(2)
     driver.find_element_by_xpath("//*[@id=\"addCustomerForm:addressIdMaybeTableZip\"]").send_keys("80111")
@@ -324,7 +331,7 @@ for item in range(3, 4):
 
     serviceAgreementNumber = driver.find_element_by_xpath('//*[@id="data"]/table[1]/tbody/tr[2]/td/table/tbody/tr[2]/td[12]').text
 
-    print('serviceAgreementNumber : '+ serviceAgreementNumber)
+    print('serviceAgreementNumber : ' + serviceAgreementNumber)
 
     driver.save_screenshot('./Reports/'+serviceAgreementNumber+'.png')
 

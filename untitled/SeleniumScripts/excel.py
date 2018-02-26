@@ -1,11 +1,24 @@
 __author__ = 'Sean Park_ViaSat'
 
+__author__='SeanPark_ViaSat'
+
+import datetime
+import time
+import string
+import random
+import openpyxl
 import pandas as pd
 import xlsxwriter
-from xlwt import Workbook, Formula, easyxf
-import time
-import openpyxl
+import xlwt
 import os
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import selenium.webdriver.support.ui as ui
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.keys import Keys
 
 '''Creating a new file, using openpyxl
 from openpyxl import Workbook
@@ -67,7 +80,7 @@ print(type(ative_sheet))
 sheet - book.get_sheet_by_name("March")
 print(sheet.title)
 '''
-wb = openpyxl.load_workbook('NewConnectOrders.xlsx')
+wb = openpyxl.load_workbook('.\Data\Addresses.xlsx')
 
 print(os.getcwd())
 
@@ -76,12 +89,12 @@ print(type(wb))
 print(wb.sheetnames)
 
 # wb.create_sheet('1')
-sheet = wb['1']
+sheet = wb['Sheet1']
 
-sheet.cell(row=2, column=2).value = 'test'
+# sheet.cell(row=10, column=2).value = 'test'
 
-print(sheet.max_row)
-print(sheet.max_column)
+print("max row : " + str(sheet.max_row))
+print("max column : " + str(sheet.max_column))
 
 # sheet.title = 'superman'
 
@@ -89,20 +102,56 @@ print(wb.sheetnames)
 
 print(type(sheet))
 
-wb.save('NewConnectOrders.xlsx')
-
 print(sheet.cell(row=2, column=2).value)
 
-wbAddress = openpyxl.load_workbook(('./Data/Addresses.xlsx'))
-sheetAddress = wbAddress['Sheet1']
+sheetAddress = wb['Sheet1']
+
 print(sheetAddress.cell(row=4, column=2).value)
 print(sheetAddress.cell(row=4, column=3).value)
 print(sheetAddress.cell(row=4, column=4).value)
 print(sheetAddress.cell(row=4, column=5).value)
 
+rowLength = sheetAddress.max_row
 
+columnLength = sheetAddress.max_column
 
+currentRow = 2
 
+for item in range(currentRow, rowLength):
+
+    username = sheetAddress.cell(row=currentRow, column=1).value
+
+    password = sheetAddress.cell(row=currentRow, column=2).value
+
+    salesChannel = sheetAddress.cell(row=currentRow, column=3).value
+
+    customerType = sheetAddress.cell(row=currentRow, column=4).value
+
+    addressLine1 = sheetAddress.cell(row=currentRow, column=7).value
+
+    city = sheetAddress.cell(row=currentRow, column=9).value
+
+    state = sheetAddress.cell(row=currentRow, column=10).value
+
+    zipCode = sheetAddress.cell(row=currentRow, column=11).value
+
+    print("username : " + username)
+
+    print("password : " + password)
+
+    print("salesChannel : " + salesChannel)
+
+    print("customerType : " + customerType)
+
+    print("addressLine1 : " + addressLine1)
+
+    print("city : " + city)
+
+    print("state : " + state)
+
+    print("zipCode : " + str(zipCode))
+
+    currentRow = currentRow + 1
 
 #sheet.cell(row=0, column=0).value = 2
 # test2sheet['A1'] = 10

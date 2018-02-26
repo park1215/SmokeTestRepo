@@ -16,44 +16,72 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import selenium.webdriver.support.ui as ui
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.keys import Keys
 
-wb = openpyxl.load_workbook('NewConnectOrders.xlsx')
+wb = openpyxl.load_workbook('./Reports/NewConnectOrders.xlsx')
 
-wbAddress = openpyxl.load_workbook(('./Data/Addresses.xlsx'))
+wbAddress = openpyxl.load_workbook('./Data/Addresses.xlsx')
+
 sheetAddress = wbAddress['Sheet1']
-username = sheetAddress.cell(row=4, column=2).value
-password = sheetAddress.cell(row=4, column=3).value
-salesChannel = sheetAddress.cell(row=4, column=4).value
-customerType = sheetAddress.cell(row=4, column=5).value
 
-driver=webdriver.Chrome("C:\\Selenium\\chromedriver.exe")
-# driver = webdriver.Ie("C:\Selenium\IEDriverServer.exe");
+rowLength = sheetAddress.max_row
 
-driver.implicitly_wait(50)
+columnLength = sheetAddress.max_column
 
-driver.set_page_load_timeout(30)
+currentRow = 2
 
-driver.get("https://ordermgmt.test.exede.net/PublicGUI-SupportGUI/v1/pages/addcustomer/serviceAvailability.xhtml")
+for item in range(currentRow, rowLength+1):
+    print("Number of Orders to be created : " + str(rowLength))
+    print("currentRow : " + str(currentRow))
 
-driver.maximize_window()
+    username = sheetAddress.cell(row=currentRow, column=1).value
 
-driver.implicitly_wait(20)
+    password = sheetAddress.cell(row=currentRow, column=2).value
 
-driver.find_element_by_xpath("//*[@id=\"document:body\"]/table/tbody/tr[2]/td/form/table/tbody/tr[3]/td[2]/input").send_keys(username)
+    salesChannel = sheetAddress.cell(row=currentRow, column=3).value
 
-driver.find_element_by_xpath("//*[@id=\"document:body\"]/table/tbody/tr[2]/td/form/table/tbody/tr[4]/td[2]/input").send_keys(password)
+    customerType = sheetAddress.cell(row=currentRow, column=4).value
 
-driver.find_element_by_name("submit").click()
+    addressLine1 = sheetAddress.cell(row=currentRow, column=7).value
 
-driver.implicitly_wait(5)
+    city = sheetAddress.cell(row=currentRow, column=9).value
 
-addCustomerTab = WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.XPATH, '//*[@id="add"]'))
-)
+    state = sheetAddress.cell(row=currentRow, column=10).value
 
-addCustomerTab.click()
+    zipCode = sheetAddress.cell(row=currentRow, column=11).value
 
-for item in range(6, 7):
+    driver = webdriver.Chrome("C:\\Selenium\\chromedriver.exe")
+    # driver = webdriver.Ie("C:\Selenium\IEDriverServer.exe");
+
+    driver.implicitly_wait(50)
+
+    driver.set_page_load_timeout(30)
+
+    driver.get("https://ordermgmt.test.exede.net/PublicGUI-SupportGUI/v1/pages/addcustomer/serviceAvailability.xhtml")
+
+    driver.maximize_window()
+
+    driver.implicitly_wait(20)
+
+    driver.find_element_by_xpath(
+        "//*[@id=\"document:body\"]/table/tbody/tr[2]/td/form/table/tbody/tr[3]/td[2]/input").send_keys(username)
+
+    driver.find_element_by_xpath(
+        "//*[@id=\"document:body\"]/table/tbody/tr[2]/td/form/table/tbody/tr[4]/td[2]/input").send_keys(password)
+
+    driver.find_element_by_name("submit").click()
+
+    driver.implicitly_wait(5)
+
+    # addCustomerTab = WebDriverWait(driver, 10).until(
+    #     EC.presence_of_element_located((By.XPATH, '//*[@id="addCustomerForm:add"]'))
+    # )
+
+    addCustomerTab = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, '//*[@id="add"]'))
+    )
+
+    addCustomerTab.click()
 
     driver.implicitly_wait(3)
     time.sleep(1)
@@ -97,8 +125,12 @@ for item in range(6, 7):
 
     if now.day < 10:
         currentDay = '0' + str(now.day)
+    else:
+        currentDay = str(now.day)
 
-    transactionReference = "SPark_" + currentDay + currentMonth + currentYear + str(item)
+    # transactionReference = "SPark_" + currentDay + currentMonth + currentYear + str(item+15)
+
+    transactionReference = "SPark_" + str(randomMacNoColon)
 
     newSheet = currentDay + "-" + currentMonth + "-" + currentYear
 
@@ -117,25 +149,33 @@ for item in range(6, 7):
 
     # driver.implicitly_wait(2)
     # driver.find_element_by_xpath("//*[@id=\"addCustomerForm:namesIdName1\"]").send_keys("Spider")
-    # time.sleep(1)
 
-    firstNameField = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH,
-                                        "//*[@id=\"addCustomerForm:namesIdName1\"]"))
+    time.sleep(1)
+    firstNameField = WebDriverWait(driver, 30).until(
+        EC.presence_of_element_located((By.ID,
+                                        'addCustomerForm:namesIdName1'))
     )
 
     firstNameField.send_keys("Spider")
 
     driver.implicitly_wait(2)
-    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:namesIdName3\"]").send_keys("Man")
+
+    time.sleep(1)
+    lastNameField = WebDriverWait(driver, 30).until(
+        EC.presence_of_element_located((By.ID,
+                                        'addCustomerForm:namesIdName3'))
+    )
+
+    lastNameField.send_keys("Man")
+
     time.sleep(1)
 
     driver.implicitly_wait(2)
-    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:addressIdMaybeTableAddress1\"]").send_keys("12017 E Lake Cir")
+    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:addressIdMaybeTableAddress1\"]").send_keys(addressLine1)
     time.sleep(1)
 
     driver.implicitly_wait(2)
-    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:addressIdMaybeTableCity\"]").send_keys("Englewood")
+    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:addressIdMaybeTableCity\"]").send_keys(city)
     time.sleep(1)
 
     driver.implicitly_wait(2)
@@ -143,7 +183,7 @@ for item in range(6, 7):
     time.sleep(1)
 
     driver.implicitly_wait(2)
-    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:addressIdMaybeTableZip\"]").send_keys("80111")
+    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:addressIdMaybeTableZip\"]").send_keys(zipCode)
     time.sleep(1)
 
     driver.implicitly_wait(2)
@@ -164,17 +204,31 @@ for item in range(6, 7):
 
     # Contacts Page
 
-    creditCheckPassed = WebDriverWait(driver, 20).until(
-    EC.presence_of_element_located((By.XPATH, '// *[@id = "addCustomerForm:_id91"]/tbody/tr/td/span'))
+    # creditCheckPassed = WebDriverWait(driver, 60).until(
+    # EC.presence_of_element_located((By.XPATH, '// *[@id = "addCustomerForm:_id91"]/tbody/tr/td/span'))
+    # )
+
+    driver.implicitly_wait(2)
+
+    # assert "The Credit Check passed." in driver.page_source
+
+    time.sleep(1)
+
+    customerReferenceField = WebDriverWait(driver, 30).until(
+        EC.presence_of_element_located((By.ID,
+                                        'addCustomerForm:customerReference'))
     )
 
-    driver.implicitly_wait(2)
-    time.sleep(1)
-    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:customerReference\"]").send_keys(transactionReference)
+    customerReferenceField.send_keys(transactionReference)
 
     driver.implicitly_wait(2)
     time.sleep(1)
-    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:accountReference\"]").send_keys(transactionReference)
+    accountReferenceField = WebDriverWait(driver, 30).until(
+        EC.presence_of_element_located((By.ID,
+                                        'addCustomerForm:accountReference'))
+    )
+
+    accountReferenceField.send_keys(transactionReference)
 
     driver.implicitly_wait(2)
     time.sleep(1)
@@ -187,7 +241,7 @@ for item in range(6, 7):
     )
 
     # Sometimes, radio button is not checked by default. So intentionally click it.
-    driver.find_element_by_xpath('//*[@id="addCustomerForm:_id112:_2"]').click()
+    driver.find_element_by_xpath('//*[@id="addCustomerForm:_id114:_2"]').click()
 
     # "is not clickable at point" error. Another element is covering the element to click. I could use execute_script() to click on this.
     nextButton = driver.find_element_by_xpath('//*[@id="addCustomerForm:nextButtonId"]')
@@ -248,6 +302,22 @@ for item in range(6, 7):
     time.sleep(1)
     driver.find_element_by_xpath('//*[@id="addCustomerForm:recurringPaymentIdRecurringPaymentMethodIdTableCreditCardIdAddressZip"]').send_keys("80111")
 
+    try:
+        taxJurisdictionDropdown = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="addCustomerForm:taxJurisdictionMenu"]'))
+        )
+
+        driver.find_element_by_xpath('//*[@id="addCustomerForm:taxJurisdictionMenu"]/option[2]').click()
+
+        print("taxJurisdiction is a dropdown menu")
+    except:
+        print("taxJurisdiction is NOT a dropdown menu")
+
+    # dropdownPresent = driver.find_element_by_xpath('//*[@id="addCustomerForm:taxJurisdictionMenu"]/option[2]').is_displayed()
+
+    # if dropdownPresent:
+    #     driver.find_element_by_xpath('//*[@id="addCustomerForm:taxJurisdictionMenu"]/option[2]').click()
+
     driver.implicitly_wait(2)
     time.sleep(1)
     driver.find_element_by_xpath('//*[@id="addCustomerForm:nextButtonId"]').click()
@@ -259,16 +329,18 @@ for item in range(6, 7):
     )
 
     scheduleButton.click()
-    time.sleep(1)
+    time.sleep(2)
 
     # Schedule Page
 
-    submitOrderButton = WebDriverWait(driver, 10).until(
+    submitOrderButton = WebDriverWait(driver, 50).until(
         EC.presence_of_element_located((By.XPATH, '//*[@id="addCustomerForm:submitButtonId"]'))
     )
 
+    time.sleep(1)
+
     submitOrderButton.click()
-    time.sleep(0.3)
+
 
     # wait for order reference number created
 
@@ -539,6 +611,14 @@ for item in range(6, 7):
     )
 
     driver.save_screenshot(screenshotDirectory + '/11_confirmation.png')
+
+    currentRow = currentRow + 1
+
+    print("current row : " + str(currentRow))
+
+    assert "Success!" in driver.page_source
+
+    driver.quit();
 
 wb.save('NewConnectOrders.xlsx')
 
