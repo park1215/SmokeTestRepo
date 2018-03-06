@@ -18,9 +18,13 @@ from selenium.webdriver.support import ui
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
-wbAddress = openpyxl.load_workbook('./Data/Addresses.xlsx')
+bankRoutingNumber = '122105278'
+
+bankAccountNumber = '0000000016'
 
 wb = openpyxl.load_workbook('./Reports/NewConnectOrders.xlsx')
+
+wbAddress = openpyxl.load_workbook('./Data/Addresses.xlsx')
 
 sheetAddress = wbAddress['Sheet1']
 
@@ -31,7 +35,7 @@ columnLength = sheetAddress.max_column
 currentRow = 2
 
 for item in range(currentRow, rowLength+1):
-    print("Number of Orders to be created in this test: " + str(rowLength-1))
+    print("Number of Orders to be created in this test run: " + str(rowLength-1))
 
     print("Current Row in address list: " + str(currentRow-1))
 
@@ -698,7 +702,7 @@ for item in range(currentRow, rowLength+1):
         EC.presence_of_element_located((By.ID, 'inputMacAddress'))
     )
 
-    alianzaMacAddress = "00A0BC4D9B5E"
+    alianzaMacAddress = "00A0BC4D9B52"
     # this mac address is from the list provided by Alianza
     deviceMacAddressField.send_keys(alianzaMacAddress)
 

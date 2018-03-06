@@ -52,3 +52,7 @@ class Employee:
 empl_1 = Employee('John', 'Smith')
 empl_2 = Employee('Corey', 'Schafer')
 empl_3 = Employee('Jane', 'Doe')
+
+bankAccountNumber = '0000000016'
+
+print(bankAccountNumber[-4:])
