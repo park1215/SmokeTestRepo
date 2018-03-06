@@ -18,6 +18,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import selenium.webdriver.support.ui as ui
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
+import logging
 
 bankRoutingNumber = '122105278'
 
@@ -35,10 +36,39 @@ columnLength = sheetAddress.max_column
 
 currentRow = 2
 
-for item in range(currentRow, rowLength+1):
-    print("Number of Orders to be created : " + str(rowLength-1))
+##################################
+### This code block is for logging
+##################################
+logdate = datetime.datetime.now().strftime('%Y-%m-%d')
+logFileName = "NewConnect_Provisioning_" + logdate + '.log'
 
-    print("currentRow : " + str(currentRow-1))
+logger = logging.getLogger('NewConnect_Provisioing')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler('./Reports/'+logFileName)
+fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+fh.setFormatter(formatter)
+# add the handlers to logger
+logger.addHandler(ch)
+logger.addHandler(fh)
+
+logger.debug('-----------------------------------------------------------------------')
+logger.debug('-----------------------------------------------------------------------')
+# logger.info('info message')
+# logger.warn('warn message')
+# logger.error('error message')
+# logger.critical('critical message')
+
+for item in range(currentRow, rowLength+1):
+    logger.debug("Number of Orders to be created in this run: " + str(rowLength-1))
+
+    logger.debug("Current Row in the data table : " + str(currentRow-1))
 
     username = sheetAddress.cell(row=currentRow, column=1).value
 
@@ -66,7 +96,7 @@ for item in range(currentRow, rowLength+1):
     else:
         voipIncluded = None
 
-    print("voip Included? : " + str(voipIncluded))
+    logger.debug("voip is included in the data table? : " + str(voipIncluded))
 
     paymentType = sheetAddress.cell(row=currentRow, column=18).value
 
@@ -74,11 +104,11 @@ for item in range(currentRow, rowLength+1):
 
     satelliteName = sheetAddress.cell(row=currentRow, column=26).value
 
-    print("Payment type : " + paymentType)
+    logger.debug("Payment type in the data table: " + paymentType)
 
-    print("Package Name : " + packageName)
+    logger.debug("Package Name : " + packageName)
 
-    print("Satellite Name : " + satelliteName)
+    logger.debug("Satellite Name : " + satelliteName)
 
     driver = webdriver.Chrome("C:\\Selenium\\chromedriver.exe")
     # driver = webdriver.Ie("C:\Selenium\IEDriverServer.exe");
@@ -143,7 +173,7 @@ for item in range(currentRow, rowLength+1):
     hexdigits = list(string.hexdigits)
     del hexdigits[10:16]
 
-    # print(hexdigits)
+    # logger.debug(hexdigits)
 
     randomMac = "AA:BB:CC:"
 
@@ -153,11 +183,11 @@ for item in range(currentRow, rowLength+1):
         if x % 2 != 0 and len(randomMac) < 17:
             randomMac = randomMac + ":"
 
-    print("Mac Address : " + randomMac)
+    logger.debug("Mac Address : " + randomMac)
 
     randomMacNoColon = randomMac.replace(':', '')
 
-    print(randomMacNoColon)
+    logger.debug(randomMacNoColon)
 
     currentMonth = months[now.month - 1]
 
@@ -182,7 +212,7 @@ for item in range(currentRow, rowLength+1):
     sheetList = wb.sheetnames
 
     if newSheetName not in sheetList:
-        print(newSheetName + " Not exist")
+        logger.debug(newSheetName + " Not exist")
         wb.create_sheet(newSheetName)
 
     ws = wb[newSheetName]
@@ -191,7 +221,7 @@ for item in range(currentRow, rowLength+1):
 
     start_of_sheet = end_of_sheet + 1
 
-    print("Start row of report sheet " + str(start_of_sheet))
+    logger.debug("Start row of report sheet : " + str(start_of_sheet))
 
     ws.cell(row=1, column=2).value = 'Transaction Reference'
     ws.cell(row=1, column=3).value = 'Service Agreement'
@@ -381,7 +411,7 @@ for item in range(currentRow, rowLength+1):
         EC.presence_of_element_located((By.XPATH, '//*[@id="addCustomerForm:optionsLabel"]'))
     )
 
-    print("Options Title : " + optionsTitle.text)
+    logger.debug("Options Title displayed is : " + optionsTitle.text)
 
     driver.implicitly_wait(2)
     time.sleep(1)
@@ -428,7 +458,7 @@ for item in range(currentRow, rowLength+1):
     # driver.implicitly_wait(2)
     # time.sleep(1)
     #
-    # print("voipUserName : " + driver.find_element_by_xpath('//*[@id="addCustomerForm:userName"]').text)
+    # logger.debug("voipUserName : " + driver.find_element_by_xpath('//*[@id="addCustomerForm:userName"]').text)
     #
     # voipPasswordConfirmField = WebDriverWait(driver, 180).until(
     #     EC.presence_of_element_located((By.XPATH, '//*[@id="addCustomerForm:confirm"]'))
@@ -478,7 +508,7 @@ for item in range(currentRow, rowLength+1):
             EC.presence_of_element_located((By.XPATH, '//*[@id="addCustomerForm:recurringPaymentInfoLabel"]'))
         )
     except:
-        print("payment method title is not displayed.")
+        logger.debug("payment method title is not displayed.")
 
     if paymentType.lower() == 'CC'.lower():
         driver.implicitly_wait(2)
@@ -558,7 +588,6 @@ for item in range(currentRow, rowLength+1):
         driver.find_element_by_xpath(
             '//*[@id="addCustomerForm:recurringPaymentIdRecurringPaymentMethodIdTableEFTTypeIdBusinessNameId"]').send_keys(
             "Business Name")
-
     try:
         taxJurisdictionDropdown = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="addCustomerForm:taxJurisdictionMenu"]'))
@@ -566,9 +595,9 @@ for item in range(currentRow, rowLength+1):
 
         driver.find_element_by_xpath('//*[@id="addCustomerForm:taxJurisdictionMenu"]/option[2]').click()
 
-        print("taxJurisdiction is a dropdown menu")
+        logger.debug("taxJurisdiction is a dropdown menu")
     except:
-        print("taxJurisdiction is NOT a dropdown menu")
+        logger.debug("taxJurisdiction is NOT a dropdown menu")
 
     # dropdownPresent = driver.find_element_by_xpath('//*[@id="addCustomerForm:taxJurisdictionMenu"]/option[2]').is_displayed()
 
@@ -614,8 +643,8 @@ for item in range(currentRow, rowLength+1):
 
     serviceAgreementReference = driver.find_element_by_xpath('//*[@id="addCustomerForm:serviceAgreementReference"]').text
 
-    print("Sales Channel : " + salesChannel)
-    print("External Account Reference : " + serviceAgreementReference)
+    logger.debug("Sales Channel for this order : " + salesChannel)
+    logger.debug("External Account Reference for this order : " + serviceAgreementReference)
 
     driver.save_screenshot(SupportPortalScreenshotDirectory + '/8_confirmation.png')
 
@@ -684,7 +713,7 @@ for item in range(currentRow, rowLength+1):
 
     serviceAgreementNumber = driver.find_element_by_xpath('//*[@id="data"]/table[1]/tbody/tr[2]/td/table/tbody/tr[2]/td[12]').text
 
-    print('serviceAgreementNumber : '+ serviceAgreementNumber)
+    logger.debug('serviceAgreementNumber for this order : ' + serviceAgreementNumber)
 
     driver.save_screenshot(SupportPortalScreenshotDirectory + '/9_spyglass.png')
 
@@ -699,6 +728,7 @@ for item in range(currentRow, rowLength+1):
     ###
     #######################################
 
+    logger.debug('Provisioning starts....')
     # driver = webdriver.Chrome("C:\\Selenium\\chromedriver.exe")
     # driver = webdriver.Ie("C:\\Selenium\\IEDriverServer.exe")
 
@@ -727,11 +757,10 @@ for item in range(currentRow, rowLength+1):
 
     time.sleep(3)
 
-    print("Web Browser in test : " + driver.name)
+    logger.debug("Web Browser used in this test : " + driver.name)
 
     ### if it's IE, it needs to bypass security warning
     if driver.name == "internet explorer":
-        print("driver is IE")
         continueLink = driver.find_element_by_id('overridelink')
         continueLink.click()
 
@@ -790,7 +819,7 @@ for item in range(currentRow, rowLength+1):
         EC.presence_of_element_located((By.XPATH, '//*[@id="installerForm:j_id40"]'))
     )
 
-    print('thankYouTag Text : ' + thankYouTag.text)
+    logger.debug('QOI in progress.....')
 
     qOIcontinueButton = WebDriverWait(driver, 60).until(
         EC.presence_of_element_located((By.XPATH, '//input[@type="submit"]'))
@@ -801,7 +830,7 @@ for item in range(currentRow, rowLength+1):
     qOIcontinueButton.click()
 
     ### Exede Voice Page
-    # print('Entering Exede Voice if voip added to service...')
+    # logger.debug('Entering Exede Voice if voip added to service...')
     #
     # voiceActivationPortalButton = WebDriverWait(driver, 60).until(
     #     EC.presence_of_element_located((By.XPATH, '//*[@value="Voice Activation Portal"]'))
@@ -820,13 +849,13 @@ for item in range(currentRow, rowLength+1):
     #
     # driver.switch_to_default_content()
     #
-    # print("default content iFrame driver title : " + driver.title)
+    # logger.debug("default content iFrame driver title : " + driver.title)
     #
     # driver.switch_to_frame(voipIFrame)
     #
-    # print("VoiP activation iFrame entered...")
+    # logger.debug("VoiP activation iFrame entered...")
     #
-    # print("VoiP iFrame driver title : " + driver.title)
+    # logger.debug("VoiP iFrame driver title : " + driver.title)
     #
     # voipAccountNumberField = WebDriverWait(driver, 60).until(
     #     EC.presence_of_element_located((By.ID, 'inputAccountNumber'))
@@ -871,7 +900,7 @@ for item in range(currentRow, rowLength+1):
     # # this mac address is from the list provided by Alianza
     # deviceMacAddressField.send_keys(alianzaMacAddress)
     #
-    # print("alianza Mac Address : " + alianzaMacAddress)
+    # logger.debug("alianza Mac Address : " + alianzaMacAddress)
     #
     # time.sleep(1)
     #
@@ -896,7 +925,7 @@ for item in range(currentRow, rowLength+1):
     #
     # deviceActivateButton.click()
     #
-    # print("activate button is clicked")
+    # logger.debug("activate button is clicked")
     #
     # time.sleep(2)
     # ### Exede Voice - Part 1: Complete the Voice Activation Portal Process Page
@@ -916,9 +945,9 @@ for item in range(currentRow, rowLength+1):
     #
     # time.sleep(1)
     #
-    # print("Back to the main IG window. driver.title : " + driver.title)
+    # logger.debug("Back to the main IG window. driver.title : " + driver.title)
     #
-    # print("after getting back to default content : " + driver.title)
+    # logger.debug("after getting back to default content : " + driver.title)
     #
     # ###
     # verifyVoiceActivationButton = WebDriverWait(driver, 60).until(
@@ -938,7 +967,7 @@ for item in range(currentRow, rowLength+1):
             EC.element_to_be_clickable((By.XPATH, '//input[@value="Customer"]'))
         )
     except:
-        print("Error Detail: Problem occurred updating the system with the provided information to register the modem. (#000048). Skipping to next row")
+        logger.debug("Error Detail: Problem occurred updating the system with the provided information to register the modem. (#000048). Skipping to next row")
         continue
 
     customerButton.click()
@@ -966,7 +995,7 @@ for item in range(currentRow, rowLength+1):
 
     pdfIFrame = driver.find_element_by_xpath('//*[@id="installerForm:j_id20"]/iframe')
 
-    # print(pdfIFrame.get_attribute('src'))
+    # logger.debug(pdfIFrame.get_attribute('src'))
 
     driver.switch_to_default_content()
 
@@ -982,7 +1011,7 @@ for item in range(currentRow, rowLength+1):
         EC.element_to_be_clickable((By.XPATH, '//*[@id="pnlElectronic"]/div/div[1]/button[1]/i'))
     )
 
-    # print("getStartedButtonAttribute : " + getStartedButton.get_attribute('class'))
+    # logger.debug("getStartedButtonAttribute : " + getStartedButton.get_attribute('class'))
 
     getStartedButton.click()
 
@@ -990,7 +1019,7 @@ for item in range(currentRow, rowLength+1):
 
     signField = driver.find_element_by_xpath('//*[@id="location1"]/div[2]/div[1]/input')
 
-    print("signField type : " + signField.get_attribute('type'))
+    logger.debug("signField type : " + signField.get_attribute('type'))
 
     signField.send_keys("Spider Man")
 
@@ -1016,7 +1045,7 @@ for item in range(currentRow, rowLength+1):
         EC.presence_of_element_located((By.XPATH, '//*[@id="installerForm:j_id25"]'))
     )
 
-    print('continueButtonAfterSign attribute : ' + continueButtonAfterSign.get_attribute('class'))
+    logger.debug('continueButtonAfterSign attribute : ' + continueButtonAfterSign.get_attribute('class'))
 
     driver.save_screenshot(provioningScreenshotDirectory + '/9_eSignComplete.png')
 
@@ -1042,7 +1071,7 @@ for item in range(currentRow, rowLength+1):
         EC.presence_of_element_located((By.XPATH, '//*[@id="installerForm:j_id19"]'))
     )
 
-    print("Confirmation Message After activation : " + confirmationMessage.text)
+    logger.debug("Confirmation Message After activation : " + confirmationMessage.text)
 
     driver.save_screenshot(provioningScreenshotDirectory + '/11_confirmation.png')
 
@@ -1052,25 +1081,29 @@ for item in range(currentRow, rowLength+1):
     ws.page_setup.fitToWidth = 1
 
     if currentRow < rowLength:
-        print("Next row : " + str(currentRow-1))
+        logger.debug("Next row : " + str(currentRow-1))
+        logger.debug('-----------------------------------------------------------------------')
     else:
-        print("End of Run. All rows are processed.")
+        logger.debug("End of Run. All rows are processed.")
 
     assert "Success!" in driver.page_source
 
     try:
         wb.save('./Reports/NewConnectOrders.xlsx')
     except PermissionError:
-        print('File is already open. Can\'t save')
+        logger.debug('File is already open. Can\'t save')
 
     driver.quit()
+
+logger.debug('-----------------------------------------------------------------------')
+logger.debug('-----------------------------------------------------------------------')
 
 # time.sleep(10)
 
 # save to the project home directory
 # driver.get_screenshot_as_file(".\\Screenshots\\facebook.png");
 
-# print(driver.title)
+# logger.debug(driver.title)
 
 # assert "Facebook" in driver.title
 
