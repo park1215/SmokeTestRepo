@@ -34,7 +34,39 @@ rowLength = sheetAddress.max_row
 
 columnLength = sheetAddress.max_column
 
+print("columnLength : " + str(columnLength))
+
+
+#columnListSet = set([])
+#columnListSet.add(sheetAddress.cell(row=1, column=x+1).value)
+
+columnList = []
+columnListDict = {}
+
+for x in range(columnLength):
+    columnListDict[sheetAddress.cell(row=1, column=x+1).value] = sheetAddress.cell(row=2, column=x+1).value
+
+
+print("ColumnListDict : " + str(columnListDict))
+
+print("Username : " + columnListDict['Username'])
+print("Password : " + columnListDict['Password'])
+
+columnListDict['Username'] = 'ChangeUserName'
+
+print("ChangedUserName : " + columnListDict['Username'])
+
 currentRow = 2
+
+addressString = "12017 E Lake Cir"
+
+streetNumber = addressString.split(" ")[0]
+
+streetAddress = addressString[addressString.index(" ")+1:]
+
+print(streetNumber)
+print(streetAddress)
+
 
 for item in range(0, 1):
     print("Number of Orders to be created : " + str(rowLength-1))
@@ -67,7 +99,7 @@ for item in range(0, 1):
     print("Package Name : " + packageName)
 
     print("Satellite Name : " + satelliteName)
-
+'''
     driver = webdriver.Chrome("C:\\Selenium\\chromedriver.exe")
     # driver = webdriver.Ie("C:\Selenium\IEDriverServer.exe");
 
@@ -203,6 +235,7 @@ for item in range(0, 1):
         print('File is already open. Can\'t save')
 
     print("end of process")
+    '''
 
 '''
     driver.implicitly_wait(2)

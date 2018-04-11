@@ -212,7 +212,7 @@ for item in range(currentRow, rowLength+1):
     sheetList = wb.sheetnames
 
     if newSheetName not in sheetList:
-        logger.debug(newSheetName + " Not exist")
+        logger.debug(newSheetName + " Not exist. It creates a new sheet : " + newSheetName)
         wb.create_sheet(newSheetName)
 
     ws = wb[newSheetName]
@@ -277,7 +277,11 @@ for item in range(currentRow, rowLength+1):
     time.sleep(1)
 
     driver.implicitly_wait(2)
-    driver.find_element_by_xpath("//*[@id=\"addCustomerForm:addressIdMaybeTableStateAddressState\"]/option[7]").click()
+    stateAddress = WebDriverWait(driver, 30).until(
+        EC.presence_of_element_located((By.XPATH,
+                                        '//*[@id="addCustomerForm:addressIdMaybeTableStateAddressState"]/option[7]'))
+    )
+    stateAddress.click()
     time.sleep(1)
 
     driver.implicitly_wait(2)
@@ -637,9 +641,13 @@ for item in range(currentRow, rowLength+1):
 
     # Confirmation Page
 
-    printButton = WebDriverWait(driver, 180).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="addCustomerForm:printButtonId"]'))
-    )
+    try:
+        printButton = WebDriverWait(driver, 180).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="addCustomerForm:printButtonId"]'))
+        )
+    except:
+        logger.debug('FSM screen is not displayed. It continues to the next row.')
+        continue
 
     serviceAgreementReference = driver.find_element_by_xpath('//*[@id="addCustomerForm:serviceAgreementReference"]').text
 
